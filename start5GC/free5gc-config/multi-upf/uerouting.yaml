@@ -1,0 +1,7 @@
+info:
+  version: 1.0.7
+  description: No-op UE routing for non-ULCL multi-UPF topology
+
+ueRoutingInfo: {}
+
+pfdDataForApp: []

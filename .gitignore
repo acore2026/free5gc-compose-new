@@ -8,3 +8,4 @@
 .gemini/oauth_creds.json
 .codex/auth.json
 .gemini/google_accounts.json
+start5GC/images/*.tar

@@ -1,0 +1,61 @@
+info:
+  version: 1.0.2
+  description: NSSF initial local configuration
+
+configuration:
+  nssfName: NSSF
+  sbi:
+    scheme: http
+    registerIPv4: nssf.free5gc.org
+    bindingIPv4: nssf.free5gc.org
+    port: 8000
+    tls:
+      pem: cert/nssf.pem
+      key: cert/nssf.key
+  serviceNameList:
+    - nnssf-nsselection
+    - nnssf-nssaiavailability
+  nrfUri: http://nrf.free5gc.org:8000
+  nrfCertPem: cert/nrf.pem
+  supportedPlmnList:
+    - mcc: 001
+      mnc: 01
+  supportedNssaiInPlmnList:
+    - plmnId:
+        mcc: 001
+        mnc: 01
+      supportedSnssaiList:
+        - sst: 1
+          sd: 000000
+        - sst: 1
+          sd: 112233
+  nsiList:
+    - snssai:
+        sst: 1
+        sd: 000000
+      nsiInformationList:
+        - nrfId: http://nrf.free5gc.org:8000/nnrf-nfm/v1/nf-instances
+          nsiId: 10
+    - snssai:
+        sst: 1
+        sd: 112233
+      nsiInformationList:
+        - nrfId: http://nrf.free5gc.org:8000/nnrf-nfm/v1/nf-instances
+          nsiId: 11
+  taList:
+    - tai:
+        plmnId:
+          mcc: 001
+          mnc: 01
+        tac: 000001
+      accessType: 3GPP_ACCESS
+      supportedSnssaiList:
+        - sst: 1
+          sd: 000000
+        - sst: 1
+          sd: 112233
+
+logger:
+  enable: true
+  level: info
+  reportCaller: false

@@ -1,0 +1,40 @@
+version: 1.0.3
+description: UPF userspace-forwarder configuration
+
+nrfUri: http://nrf.free5gc.org:8000
+
+pfcp:
+  addr: upf.free5gc.org
+  nodeID: upf.free5gc.org
+  retransTimeout: 1s
+  maxRetrans: 3
+
+sbi:
+  scheme: http
+  registerIPv4: upf.free5gc.org
+  bindingIPv4: upf.free5gc.org
+  port: 8000
+
+gtpu:
+  forwarder: userspace
+  ifList:
+    - addr: upf.free5gc.org
+      type: N3
+  userspace:
+    workers: 4
+    queueSize: 1024
+    tunName: upfusr0
+    tunMtu: 1400
+
+dnnList:
+  - dnn: internet
+    cidr: 10.60.0.0/16
+    natifname: eth0
+  - dnn: internet
+    cidr: 10.61.0.0/16
+    natifname: eth0
+
+logger:
+  enable: true
+  level: info
+  reportCaller: false
