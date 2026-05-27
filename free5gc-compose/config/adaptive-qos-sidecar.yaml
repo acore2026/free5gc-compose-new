@@ -1,0 +1,7 @@
+proxyTemplate: "https://upf:4433/masque?h={target_host}&p={target_port}"
+targetHost: "127.0.0.1"
+targetPort: 7777
+serverName: "upf"
+insecureSkipVerify: true
+http:
+  listenAddress: "0.0.0.0:8081"

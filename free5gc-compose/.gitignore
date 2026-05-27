@@ -1,0 +1,13 @@
+# vscode
+.vscode
+
+mongodb
+base/free5gc
+
+# cert
+cert/*_*.pem
+
+# Tools
+.codex/
+.gemini/
+gtp5g/
