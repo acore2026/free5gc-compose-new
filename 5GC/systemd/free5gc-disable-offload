@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -u
+
+LOG_TAG="free5gc-disable-offload"
+HOST_IFACES=(eth1 br-free5gc)
+UPF_IFACES=(eth0 upfusr0)
+UPF_CONTAINER="${UPF_CONTAINER:-upf}"
+TRIES="${TRIES:-60}"
+SLEEP_SECONDS="${SLEEP_SECONDS:-2}"
+
+log() {
+    echo "$LOG_TAG: $*"
+}
+
+disable_iface() {
+    local iface="$1"
+    local nsenter_args=("${@:2}")
+    local features=(rx tx tso gso gro)
+    local feature
+
+    for feature in "${features[@]}"; do
+        "${nsenter_args[@]}" ethtool -K "$iface" "$feature" off >/dev/null 2>&1 || true
+    done
+}
+
+wait_for_host_iface() {
+    local iface="$1"
+    local i
+
+    for ((i = 1; i <= TRIES; i++)); do
+        if ip link show dev "$iface" >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep "$SLEEP_SECONDS"
+    done
+
+    log "host interface $iface was not found"
+    return 1
+}
+
+wait_for_upf_pid() {
+    local pid
+    local i
+
+    for ((i = 1; i <= TRIES; i++)); do
+        pid="$(docker inspect -f '{{.State.Pid}}' "$UPF_CONTAINER" 2>/dev/null || true)"
+        if [[ "$pid" =~ ^[0-9]+$ ]] && [[ "$pid" != "0" ]]; then
+            echo "$pid"
+            return 0
+        fi
+        sleep "$SLEEP_SECONDS"
+    done
+
+    log "container $UPF_CONTAINER was not running"
+    return 1
+}
+
+main() {
+    local iface
+    local upf_pid
+    local failed=0
+
+    for iface in "${HOST_IFACES[@]}"; do
+        if wait_for_host_iface "$iface"; then
+            disable_iface "$iface"
+            log "disabled offload on host $iface"
+        else
+            failed=1
+        fi
+    done
+
+    upf_pid="$(wait_for_upf_pid)" || failed=1
+    if [[ -n "${upf_pid:-}" ]]; then
+        for iface in "${UPF_IFACES[@]}"; do
+            if nsenter -t "$upf_pid" -n ip link show dev "$iface" >/dev/null 2>&1; then
+                disable_iface "$iface" nsenter -t "$upf_pid" -n
+                log "disabled offload on $UPF_CONTAINER:$iface"
+            else
+                log "interface $UPF_CONTAINER:$iface was not found"
+                failed=1
+            fi
+        done
+    fi
+
+    return "$failed"
+}
+
+main "$@"
