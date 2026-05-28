@@ -1,34 +1,63 @@
 version: 1.0.3
-description: UPF initial local configuration
+description: UPF userspace-forwarder configuration
 
-# The listen IP and nodeID of the N4 interface on this UPF (Can't set to 0.0.0.0)
+nrfUri: http://nrf.free5gc.org:8000
+
 pfcp:
-  addr: upf.free5gc.org # IP addr for listening
-  nodeID: upf.free5gc.org # External IP or FQDN can be reached
-  retransTimeout: 1s # retransmission timeout
-  maxRetrans: 3 # the max number of retransmission
+  addr: upf.free5gc.org
+  nodeID: upf.free5gc.org
+  retransTimeout: 1s
+  maxRetrans: 3
+
+sbi:
+  scheme: http
+  registerIPv4: upf.free5gc.org
+  bindingIPv4: upf.free5gc.org
+  port: 8000
 
 gtpu:
-  forwarder: gtp5g
-  # The IP list of the N3/N9 interfaces on this UPF
-  # If there are multiple connection, set addr to 0.0.0.0 or list all the addresses
+  forwarder: userspace
   ifList:
-    - addr: upf.free5gc.org
+    - addr: 0.0.0.0
       type: N3
-      # name: upf.5gc.nctu.me
-      # ifname: gtpif
-      # mtu: 1400
+  userspace:
+    workers: 4
+    queueSize: 1024
+    tunName: upfusr0
+    tunMtu: 1400
+  adaptiveQos:
+    enable: true
+    masqueBindAddress: upf.free5gc.org
+    masquePort: 4433
+    reportBindAddress: 127.0.0.1
+    reportPort: 7777
+    debugBindAddress: 0.0.0.0
+    debugPort: 9082
+    tls:
+      pem: /free5gc/config/adaptive-upf.pem
+      key: /free5gc/config/adaptive-upf.key
 
-# The DNN list supported by UPF
 dnnList:
-  - dnn: internet # Data Network Name
-    cidr: 10.60.0.0/16 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-    # natifname: eth0
-  - dnn: internet # Data Network Name
-    cidr: 10.61.0.0/16 # Classless Inter-Domain Routing for assigned IPv4 pool of UE
-    # natifname: eth0
+  - dnn: internet
+    cidr: 10.60.0.0/16
+    natifname: eth0
+  - dnn: internet
+    cidr: 10.61.0.0/16
+    natifname: eth0
+  - dnn: IMS
+    cidr: 10.62.0.0/16
+    natifname: eth0
+  - dnn: IMS
+    cidr: 10.63.0.0/16
+    natifname: eth0
+  - dnn: ims
+    cidr: 10.64.0.0/16
+    natifname: eth0
+  - dnn: ims
+    cidr: 10.65.0.0/16
+    natifname: eth0
 
-logger: # log output setting
-  enable: true # true or false
-  level: info # how detailed to output, value: trace, debug, info, warn, error, fatal, panic
-  reportCaller: false # enable the caller report or not, value: true or false
+logger:
+  enable: true
+  level: info
+  reportCaller: false

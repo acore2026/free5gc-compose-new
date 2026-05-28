@@ -18,12 +18,12 @@ configuration:
   nrfUri: http://nrf.free5gc.org:8000
   nrfCertPem: cert/nrf.pem
   supportedPlmnList:
-    - mcc: 460
-      mnc: 11
+    - mcc: 001
+      mnc: 01
   supportedNssaiInPlmnList:
     - plmnId:
-        mcc: 460
-        mnc: 11
+        mcc: 001
+        mnc: 01
       supportedSnssaiList:
         - sst: 1
           sd: 000000
@@ -45,8 +45,8 @@ configuration:
   taList:
     - tai:
         plmnId:
-          mcc: 460
-          mnc: 11
+          mcc: 001
+          mnc: 01
         tac: 000001
       accessType: 3GPP_ACCESS
       supportedSnssaiList:

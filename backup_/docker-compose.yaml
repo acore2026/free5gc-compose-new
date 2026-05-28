@@ -3,13 +3,23 @@ version: "3.8"
 services:
   free5gc-upf:
     container_name: upf
-    image: free5gc/upf-userspace:latest
+    sysctls:
+      - net.ipv4.ip_forward=1
+    image: free5gc/upf:v4.2.1.ac2
     command: bash -c "./upf-iptables.sh && ./upf -c ./config/upfcfg.yaml"
+    ports:
+      - 2152:2152/udp
+      - 8805:8805/udp
+      - 9082:9082
     volumes:
-      - ./config/upfcfg.yaml:/free5gc/config/upfcfg.yaml
+      - ${UPF_CONFIG_PATH:-./config/upfcfg.yaml}:/free5gc/config/upfcfg.yaml
       - ./config/upf-iptables.sh:/free5gc/upf-iptables.sh
+      - ./free5gc-compose/config/adaptive-upf.pem:/free5gc/config/adaptive-upf.pem
+      - ./free5gc-compose/config/adaptive-upf.key:/free5gc/config/adaptive-upf.key
     cap_add:
       - NET_ADMIN
+    devices:
+      - "/dev/net/tun"
     networks:
       privnet:
         aliases:
@@ -59,6 +69,7 @@ services:
       - ./cert:/free5gc/cert
     environment:
       GIN_MODE: release
+      AMF_NF_INSTANCE_ID: c8e62953-f380-4b07-97b1-a3e7a702ee52
     networks:
       privnet:
         aliases:
@@ -200,142 +211,6 @@ services:
       - free5gc-nrf
       - free5gc-webui
 
-  free5gc-n3iwf:
-
-  ueransim-ue:
-    container_name: ueransim-ue
-    image: free5gc/ueransim:latest
-    command: ./nr-ue -c ./config/uecfg.yaml
-    volumes:
-      - ./config/uecfg.yaml:/ueransim/config/uecfg.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    network_mode: host
-    depends_on:
-      - ueransim
-    container_name: n3iwf
-
-  ueransim-ue:
-    container_name: ueransim-ue
-    image: free5gc/ueransim:latest
-    command: ./nr-ue -c ./config/uecfg.yaml
-    volumes:
-      - ./config/uecfg.yaml:/ueransim/config/uecfg.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    network_mode: host
-    depends_on:
-      - ueransim
-    image: free5gc/n3iwf:v4.2.1
-
-  ueransim-ue:
-    container_name: ueransim-ue
-    image: free5gc/ueransim:latest
-    command: ./nr-ue -c ./config/uecfg.yaml
-    volumes:
-      - ./config/uecfg.yaml:/ueransim/config/uecfg.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    network_mode: host
-    depends_on:
-      - ueransim
-    command: ./n3iwf -c ./config/n3iwfcfg.yaml
-
-  ueransim-ue:
-    container_name: ueransim-ue
-    image: free5gc/ueransim:latest
-    command: ./nr-ue -c ./config/uecfg.yaml
-    volumes:
-      - ./config/uecfg.yaml:/ueransim/config/uecfg.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    network_mode: host
-    depends_on:
-      - ueransim
-    volumes:
-      - ./config/n3iwfcfg.yaml:/free5gc/config/n3iwfcfg.yaml
-
-  ueransim-ue:
-    container_name: ueransim-ue
-    image: free5gc/ueransim:latest
-    command: ./nr-ue -c ./config/uecfg.yaml
-    volumes:
-      - ./config/uecfg.yaml:/ueransim/config/uecfg.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    network_mode: host
-    depends_on:
-      - ueransim
-      - ./config/n3iwf-ipsec.sh:/free5gc/n3iwf-ipsec.sh
-
-  ueransim-ue:
-    container_name: ueransim-ue
-    image: free5gc/ueransim:latest
-    command: ./nr-ue -c ./config/uecfg.yaml
-    volumes:
-      - ./config/uecfg.yaml:/ueransim/config/uecfg.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    network_mode: host
-    depends_on:
-      - ueransim
-    environment:
-      GIN_MODE: release
-    cap_add:
-      - NET_ADMIN
-    networks:
-      privnet:
-        ipv4_address: 10.100.200.15
-        aliases:
-          - n3iwf.free5gc.org
-
-  ueransim-ue:
-    container_name: ueransim-ue
-    image: free5gc/ueransim:latest
-    command: ./nr-ue -c ./config/uecfg.yaml
-    volumes:
-      - ./config/uecfg.yaml:/ueransim/config/uecfg.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    network_mode: host
-    depends_on:
-      - ueransim
-    depends_on:
-      - free5gc-amf
-      - free5gc-smf
-      - free5gc-upf
-
-  free5gc-tngf:
-    container_name: tngf
-    image: free5gc/tngf:v4.2.1
-    command: ./tngf -c ./config/tngfcfg.yaml
-    volumes:
-      - ./config/tngfcfg.yaml:/free5gc/config/tngfcfg.yaml
-      - ./cert:/free5gc/cert
-    environment:
-      GIN_MODE: release
-    cap_add:
-      - NET_ADMIN
-    network_mode: host
-    depends_on:
-      - free5gc-amf
-      - free5gc-smf
-      - free5gc-upf
-
   free5gc-nef:
     container_name: nef
     image: free5gc/nef:v4.2.1
@@ -377,54 +252,6 @@ services:
       - db
       - free5gc-nrf
 
-  ueransim:
-    container_name: ueransim
-    image: free5gc/ueransim:latest
-    command: ./nr-gnb -c ./config/gnbcfg.yaml
-    volumes:
-      - ./config/gnbcfg.yaml:/ueransim/config/gnbcfg.yaml
-      - ./config/uecfg.yaml:/ueransim/config/uecfg.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    network_mode: host
-    depends_on:
-      - free5gc-amf
-      - free5gc-upf
-
-  n3iwue:
-    container_name: n3iwue
-    image: free5gc/n3iwue:latest
-    command: bash -c "ip route del default && ip route add default via 10.100.200.1 dev eth0 metric 203 && sleep infinity"
-    volumes:
-      - ./config/n3uecfg.yaml:/n3iwue/config/n3ue.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - "/dev/net/tun"
-    networks:
-      privnet:
-        ipv4_address: 10.100.200.203
-        aliases:
-          - n3ue.free5gc.org
-    depends_on:
-      - free5gc-n3iwf
-
-  ueransim-ue:
-    container_name: ueransim-ue
-    image: free5gc/ueransim:latest
-    command: ./nr-ue -c ./config/uecfg.yaml
-    volumes:
-      - ./config/uecfg.yaml:/ueransim/config/uecfg.yaml
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun
-    network_mode: host
-    depends_on:
-      - ueransim
-
 networks:
   privnet:
     ipam:
@@ -436,4 +263,3 @@ networks:
 
 volumes:
   dbdata:
-
