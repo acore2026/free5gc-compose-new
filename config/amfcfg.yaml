@@ -43,6 +43,7 @@ configuration:
           sd: 112233
   supportDnnList:
     - IMS
+    - ims
     - internet
   nrfUri: http://nrf.free5gc.org:8000
   nrfCertPem: cert/nrf.pem

@@ -5,7 +5,7 @@ services:
     container_name: upf
     sysctls:
       - net.ipv4.ip_forward=1
-    image: free5gc/upf:v4.2.1.ac
+    image: free5gc/upf:v4.2.1.ac2
     command: bash -c "./upf-iptables.sh && ./upf -c ./config/upfcfg.yaml"
     ports:
       - 2152:2152/udp

@@ -50,6 +50,12 @@ dnnList:
   - dnn: IMS
     cidr: 10.63.0.0/16
     natifname: eth0
+  - dnn: ims
+    cidr: 10.64.0.0/16
+    natifname: eth0
+  - dnn: ims
+    cidr: 10.65.0.0/16
+    natifname: eth0
 
 logger:
   enable: true

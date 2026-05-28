@@ -25,12 +25,23 @@ configuration:
           dns:
             ipv4: 8.8.8.8
             ipv6: 2001:4860:4860::8888
+          pduSessionTypes:
+            - IPv4
+            - IPv6
+            - IPv4v6
         - dnn: IMS
           dns:
-            ipv4: 10.88.120.99
+            ipv4: 10.100.200.99
             ipv6: 2001:4860:4860::8888
           pcscf:
-            ipv4: 10.88.120.99
+            ipv4: 10.100.200.99
+            ipv6: 2001:4860:4860::8888
+        - dnn: ims
+          dns:
+            ipv4: 10.100.200.99
+            ipv6: 2001:4860:4860::8888
+          pcscf:
+            ipv4: 10.100.200.99
             ipv6: 2001:4860:4860::8888
     - sNssai:
         sst: 1
@@ -40,12 +51,23 @@ configuration:
           dns:
             ipv4: 8.8.8.8
             ipv6: 2001:4860:4860::8888
+          pduSessionTypes:
+            - IPv4
+            - IPv6
+            - IPv4v6
         - dnn: IMS
           dns:
-            ipv4: 10.88.120.99
+            ipv4: 10.100.200.99
             ipv6: 2001:4860:4860::8888
           pcscf:
-            ipv4: 10.88.120.99
+            ipv4: 10.100.200.99
+            ipv6: 2001:4860:4860::8888
+        - dnn: ims
+          dns:
+            ipv4: 10.100.200.99
+            ipv6: 2001:4860:4860::8888
+          pcscf:
+            ipv4: 10.100.200.99
             ipv6: 2001:4860:4860::8888
   plmnList:
     - mcc: 001
@@ -74,6 +96,9 @@ configuration:
               - dnn: IMS
                 pools:
                   - cidr: 10.62.0.0/16
+              - dnn: ims
+                pools:
+                  - cidr: 10.64.0.0/16
           - sNssai:
               sst: 1
               sd: 112233
@@ -84,6 +109,9 @@ configuration:
               - dnn: IMS
                 pools:
                   - cidr: 10.63.0.0/16
+              - dnn: ims
+                pools:
+                  - cidr: 10.65.0.0/16
         interfaces:
           - interfaceType: N3
             endpoints:
@@ -91,6 +119,7 @@ configuration:
             networkInstances:
               - internet
               - IMS
+              - ims
     links:
       - A: gNB1
         B: UPF
