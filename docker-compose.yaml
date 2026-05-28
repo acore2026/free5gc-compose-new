@@ -24,6 +24,7 @@ services:
       privnet:
         aliases:
           - upf.free5gc.org
+        ipv4_address: 10.100.200.3
 
   db:
     container_name: mongodb
