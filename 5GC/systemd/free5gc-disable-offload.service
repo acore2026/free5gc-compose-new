@@ -1,0 +1,15 @@
+[Unit]
+Description=Disable checksum and segmentation offload for free5GC IMS debugging
+Wants=network-online.target docker.service
+After=network-online.target docker.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/free5gc-disable-offload
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=15s
+
+[Install]
+WantedBy=multi-user.target

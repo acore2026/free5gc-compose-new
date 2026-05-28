@@ -7,7 +7,7 @@ echo "=========================================="
 echo "     Free5GC + IMS 一键启动脚本"
 echo "=========================================="
 
-echo "[1/3] 加载Docker镜像..."
+echo "[1/4] 加载Docker镜像..."
 cd "$SCRIPT_DIR"
 
 docker load -i mongodb.tar
@@ -24,22 +24,37 @@ docker load -i upf.tar
 docker tag free5gc/upf:backup free5gc/upf:v4.2.1.ac2
 docker rmi free5gc/upf:backup 2>/dev/null
 
-echo "[2/3] 启动5GC容器 (docker-compose)..."
+echo "[2/4] 启动5GC容器 (docker-compose)..."
 cd "$COMPOSE_DIR"
 docker-compose up -d
 
 echo "等待容器启动..."
 sleep 5
 
-echo "[3/3] 启动IMS服务..."
+echo "[3/4] 部署IMS服务配置..."
+
+echo "部署 kamailio 服务..."
+cp "$SCRIPT_DIR/systemd/kamailio.service" /usr/lib/systemd/system/kamailio.service
+cp "$SCRIPT_DIR/systemd/kamailio.cfg" /etc/kamailio/kamailio.cfg
+cp "$SCRIPT_DIR/systemd/kamailio.default" /etc/default/kamailio
+systemctl daemon-reload
+
+echo "部署 free5gc-disable-offload 服务..."
+cp "$SCRIPT_DIR/systemd/free5gc-disable-offload" /usr/local/sbin/free5gc-disable-offload
+cp "$SCRIPT_DIR/systemd/free5gc-disable-offload.service" /etc/systemd/system/free5gc-disable-offload.service
+
+echo "部署 free5gc-ue-routes 服务..."
+cp "$SCRIPT_DIR/systemd/free5gc-ue-routes.service" /etc/systemd/system/free5gc-ue-routes.service
+
+systemctl daemon-reload
+
+echo "[4/4] 启动IMS服务..."
 
 echo "启动 kamailio..."
-cp "$SCRIPT_DIR/systemd/kamailio.cfg" /etc/kamailio/kamailio.cfg
 systemctl start kamailio.service
 systemctl status kamailio.service --no-pager -l | grep -E "(Active|Loaded)"
 
 echo "启动 free5gc-disable-offload..."
-cp "$SCRIPT_DIR/systemd/free5gc-disable-offload" /usr/local/sbin/free5gc-disable-offload
 systemctl start free5gc-disable-offload.service
 systemctl status free5gc-disable-offload.service --no-pager -l | grep -E "(Active|Loaded)"
 

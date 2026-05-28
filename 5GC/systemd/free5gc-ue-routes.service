@@ -1,0 +1,18 @@
+[Unit]
+Description=Free5GC UE pool routes via UPF
+After=docker.service network-online.target
+Wants=docker.service network-online.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sh -c "for i in $(seq 1 60); do ip link show br-free5gc >/dev/null 2>&1 && exit 0; sleep 1; done; exit 1"
+ExecStart=/usr/sbin/ip route replace 10.60.0.0/16 via 10.100.200.3 dev br-free5gc
+ExecStart=/usr/sbin/ip route replace 10.61.0.0/16 via 10.100.200.3 dev br-free5gc
+ExecStart=/usr/sbin/ip route replace 10.62.0.0/16 via 10.100.200.3 dev br-free5gc
+ExecStart=/usr/sbin/ip route replace 10.63.0.0/16 via 10.100.200.3 dev br-free5gc
+ExecStart=/usr/sbin/ip route replace 10.64.0.0/16 via 10.100.200.3 dev br-free5gc
+ExecStart=/usr/sbin/ip route replace 10.65.0.0/16 via 10.100.200.3 dev br-free5gc
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
