@@ -1,0 +1,3 @@
+FROM free5gc_local/upf:v4.2.1.ac
+
+COPY base/free5gc/bin/upf /free5gc/upf

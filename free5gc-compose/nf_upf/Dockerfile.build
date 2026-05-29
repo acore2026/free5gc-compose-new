@@ -1,0 +1,33 @@
+FROM golang:1.25.5-trixie AS builder
+
+WORKDIR /build
+
+COPY base/free5gc/NFs/upf/go.mod ./
+COPY base/free5gc/NFs/upf/go.sum ./
+RUN go mod download
+
+COPY base/free5gc/NFs/upf/ ./
+RUN CGO_ENABLED=0 GOOS=linux go build -o upf ./cmd/main.go
+
+FROM bitnami/minideb:trixie
+
+LABEL description="free5GC open source 5G Core Network" \
+    version="Stage 3"
+
+ENV F5GC_MODULE=upf
+ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBUG_TOOLS
+
+RUN if [ "$DEBUG_TOOLS" = "true" ] ; then apt-get update && apt-get install -y vim strace net-tools iputils-ping curl netcat tcpdump; fi
+
+RUN apt-get update \
+    && apt-get install -y tini libmnl0 libyaml-0-2 iproute2 iptables \
+    && ln -sf /usr/bin/tini /sbin/tini \
+    && apt-get clean
+
+WORKDIR /free5gc
+RUN mkdir -p config/ log/
+
+COPY --from=builder /build/upf ./upf
+
+VOLUME [ "/free5gc/config" ]

@@ -1,0 +1,3 @@
+FROM free5gc_local/smf:v4.2.1
+
+COPY base/free5gc/bin/smf /free5gc/smf

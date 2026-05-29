@@ -1,0 +1,23 @@
+FROM bitnami/minideb:trixie
+
+LABEL description="free5GC open source 5G Core Network" \
+    version="Stage 3"
+
+ENV F5GC_MODULE=upf
+ENV DEBIAN_FRONTEND=noninteractive
+ARG DEBUG_TOOLS
+
+RUN if [ "$DEBUG_TOOLS" = "true" ] ; then apt-get update && apt-get install -y vim strace net-tools iputils-ping curl netcat tcpdump; fi
+
+RUN apt-get update \
+    && apt-get install -y tini libmnl0 libyaml-0-2 iproute2 iptables \
+    && ln -sf /usr/bin/tini /sbin/tini \
+    && apt-get clean
+
+WORKDIR /free5gc
+RUN mkdir -p config/ log/
+
+COPY base/free5gc/bin/upf ./upf
+COPY base/free5gc/bin/gtp5g-tunnel ./gtp5g-tunnel
+
+VOLUME [ "/free5gc/config" ]
