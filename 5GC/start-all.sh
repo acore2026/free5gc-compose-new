@@ -3,6 +3,8 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 COMPOSE_DIR="/home/core"
 
+source "$SCRIPT_DIR/init_env.sh"
+
 echo "=========================================="
 echo "     Free5GC + IMS 一键启动脚本"
 echo "=========================================="

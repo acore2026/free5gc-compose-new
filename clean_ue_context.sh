@@ -255,17 +255,14 @@ echo "  • AMF和SMF需要通过正常去注册流程或超时机制清理内�
 echo "  • UPF的PFCP会话可能需要手动清理或等待超时"
 echo "  • 签约数据已保留，UE可以重新注册"
 
-# 提供重启NF的选项
+# 重启所有网元以清理内存上下文
 echo ""
-if [ "$MODE" == "all" ]; then
-    read -p "是否重启AMF和SMF以清理内存上下文？(yes/no): " restart_confirm
-    if [ "$restart_confirm" == "yes" ]; then
-        echo -e "${YELLOW}重启AMF和SMF...${NC}"
-        docker restart amf smf
-        sleep 5
-        echo -e "${GREEN}AMF和SMF已重启${NC}"
-    fi
-fi
+echo -e "${YELLOW}重启所有网元...${NC}"
 
+docker-compose down
+docker-compose up -d
+echo -e "${GREEN}所有网元已重启完成！${NC}"
+
+echo ""
 echo "=========================================="
 echo -e "${GREEN}清理操作完成！${NC}"
