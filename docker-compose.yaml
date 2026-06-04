@@ -60,7 +60,7 @@ services:
 
   free5gc-amf:
     container_name: amf
-    image: free5gc/amf:v4.2.1
+    image: free5gc/amf:updateuev2
     command: ./amf -c ./config/amfcfg.yaml
     ports:
       - "10.88.120.100:38412:38412/sctp"
