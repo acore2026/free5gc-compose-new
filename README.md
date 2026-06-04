@@ -26,12 +26,20 @@ cd 5GC
 ```
 一键清除所有用户db数据和上下文（不包括签约数据）
 
-### 场景三：重启核心网和IMS
+### 场景三：重启核心网和IMS（含清理UE上下文、重新加载gtp5g模块）
 
 ```bash
-docker-compose down && docker-compose up -d
-./5GC/stop-ims.sh && ./5GC/start-ims.sh
+./restart-all.sh
 ```
+
+脚本执行流程：
+1. 停止 IMS 服务（kamailio / free5gc-disable-offload / free5gc-ue-routes）
+2. 停止 Docker 容器
+3. 重新加载 gtp5g 内核模块
+4. 启动 Docker 容器，等待 MongoDB 就绪
+5. 清理 UE 上下文（AMF接入上下文 + 认证状态）
+6. 配置网络（eth1 IP / br-free5gc IP）
+7. 启动 IMS 服务
 
 ### 场景四：IMS网元或网络不通
 
