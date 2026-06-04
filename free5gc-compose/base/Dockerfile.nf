@@ -6,6 +6,9 @@ FROM free5gc/base AS my-base
 
 ENV DEBIAN_FRONTEND=noninteractive
 ARG F5GC_MODULE
+ARG GOPROXY=https://goproxy.cn,direct
+
+ENV GOPROXY=${GOPROXY}
 
 # Get Free5GC
 COPY free5gc/ $GOPATH/src/free5gc/
