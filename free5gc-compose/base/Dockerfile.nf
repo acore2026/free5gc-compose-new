@@ -28,6 +28,7 @@ RUN mkdir -p cert/ public
 
 # Copy executables
 COPY --from=my-base /go/src/free5gc/bin/${F5GC_MODULE} ./
+RUN chmod +x /free5gc/${F5GC_MODULE}
 
 # Copy configuration files (not used for now)
 COPY --from=my-base /go/src/free5gc/config/* ./config/
