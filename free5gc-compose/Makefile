@@ -14,8 +14,12 @@ base:
 
 smf: base
 	docker build --build-arg F5GC_MODULE=smf -t ${DOCKER_IMAGE_OWNER}/smf-base:${DOCKER_IMAGE_TAG} -f ./base/Dockerfile.nf ./base
-amf: base
-	docker build --build-arg F5GC_MODULE=amf -t ${DOCKER_IMAGE_OWNER}/amf-base:${DOCKER_IMAGE_TAG} -f ./base/Dockerfile.nf ./base
+amf:
+	@echo "=== Compiling AMF binary ==="
+	cd base/free5gc/NFs/amf && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o ../../../../nf_amf/amf-binary ./cmd/
+	@echo "=== Building AMF Docker image ==="
+	docker build -t ${DOCKER_IMAGE_OWNER}/amf:${DOCKER_IMAGE_TAG} ./nf_amf
+	docker image ls ${DOCKER_IMAGE_OWNER}/amf:${DOCKER_IMAGE_TAG}
 upf: base
 	docker build --build-arg F5GC_MODULE=upf -t ${DOCKER_IMAGE_OWNER}/upf-base:${DOCKER_IMAGE_TAG} -f ./base/Dockerfile.nf ./base
 udr: base

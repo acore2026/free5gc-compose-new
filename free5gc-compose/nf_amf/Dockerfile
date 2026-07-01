@@ -1,31 +1,25 @@
-FROM free5gc/amf-base:latest AS builder
 FROM alpine:3.15
 
-LABEL description="Free5GC open source 5G Core Network" \
+LABEL description="Free5GC open source 5G Core Network - AMF" \
     version="Stage 3"
 
 ENV F5GC_MODULE=amf
-ARG DEBUG_TOOLS
 
-# Install debug tools ~ 100MB (if DEBUG_TOOLS is set to true)
-RUN if [ "$DEBUG_TOOLS" = "true" ] ; then apk add -U vim strace net-tools curl netcat-openbsd ; fi
+RUN apk add --no-cache tini
 
-# Set working dir
 WORKDIR /free5gc
 RUN mkdir -p config/ log/ cert/
 
-# Copy executable and default certs
-COPY --from=builder /sbin/tini /sbin/tini
-COPY --from=builder /free5gc/${F5GC_MODULE} ./
-RUN chmod +x /free5gc/${F5GC_MODULE}
-COPY --from=builder /free5gc/cert/${F5GC_MODULE}.pem ./cert/
-COPY --from=builder /free5gc/cert/${F5GC_MODULE}.key ./cert/
+COPY amf-binary ./amf
+RUN chmod +x ./amf
 
-# Config files volume
+COPY amf.pem ./cert/
+COPY amf.key ./cert/
+
 VOLUME [ "/free5gc/config" ]
-
-# Certificates (if not using default) volume
 VOLUME [ "/free5gc/cert" ]
 
-# Exposed ports
 EXPOSE 8000
+
+ENTRYPOINT [ "/sbin/tini", "--" ]
+CMD [ "./amf" ]
