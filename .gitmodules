@@ -1,0 +1,3 @@
+[submodule "nf_amf/amf"]
+	path = nf_amf/amf
+	url = git@github.com:acore2026/amf.git
