@@ -13,11 +13,18 @@ fi
 
 if [ -f /home/core/gtp5g/gtp5g.ko ]; then
   echo 加载预编译gtp5g模块
-  insmod /home/core/gtp5g/gtp5g.ko
-  lsmod | grep gtp5g
-  echo gtp5g模块加载成功
+  if insmod /home/core/gtp5g/gtp5g.ko; then
+    lsmod | grep gtp5g
+    echo gtp5g模块加载成功
+  else
+    echo 错误: gtp5g模块加载失败
+    echo 请检查内核版本是否匹配: uname -r
+    echo 查看详细错误: dmesg \| tail -20
+    exit 1
+  fi
 else
-  echo 警告: 未找到gtp5g.ko文件
+  echo 错误: 未找到gtp5g.ko文件
+  exit 1
 fi
 echo
 

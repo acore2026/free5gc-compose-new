@@ -30,12 +30,41 @@ ok "Docker 容器已停止"
 
 step 3 "加载 gtp5g 内核模块..."
 if lsmod | grep -q gtp5g; then
-    rmmod gtp5g 2>/dev/null || true
+    echo -e "${YELLOW}  移除旧 gtp5g 模块...${NC}"
+    if ! rmmod gtp5g 2>/dev/null; then
+        echo -e "${YELLOW}  警告: 无法移除旧模块，可能正在使用中${NC}"
+    fi
 fi
-if [ -f /home/core/gtp5g/gtp5g.ko ]; then
-    insmod /home/core/gtp5g/gtp5g.ko && ok "gtp5g 模块加载成功" || fail "gtp5g 模块加载失败"
+
+GTP5G_KO="/home/core/gtp5g/gtp5g.ko"
+GTP5G_DIR="/home/core/gtp5g"
+KERNEL_VER=$(uname -r)
+
+if [ ! -f "$GTP5G_KO" ]; then
+    fail "未找到 gtp5g.ko 文件"
+fi
+
+MODULE_VER=$(modinfo "$GTP5G_KO" 2>/dev/null | grep "^vermagic:" | awk '{print $2}')
+if [ "$MODULE_VER" != "$KERNEL_VER" ]; then
+    echo -e "${YELLOW}  模块版本不匹配 (模块: $MODULE_VER, 内核: $KERNEL_VER)${NC}"
+    echo -e "${YELLOW}  正在重新编译 gtp5g 模块...${NC}"
+    if ! make -C "$GTP5G_DIR" clean >/dev/null 2>&1; then
+        echo -e "${YELLOW}  警告: make clean 失败，继续尝试编译${NC}"
+    fi
+    if make -C "$GTP5G_DIR" 2>&1 | grep -q "Error"; then
+        echo -e "${RED}  详细错误信息:${NC}"
+        make -C "$GTP5G_DIR" 2>&1 | tail -20
+        fail "gtp5g 模块编译失败"
+    fi
+    ok "gtp5g 模块编译成功"
+fi
+
+if insmod "$GTP5G_KO"; then
+    ok "gtp5g 模块加载成功"
 else
-    fail "未找到 gtp5g.ko"
+    echo -e "${RED}  详细错误信息:${NC}"
+    dmesg | tail -10 | grep -i gtp || true
+    fail "gtp5g 模块加载失败 (内核: $(uname -r))"
 fi
 
 step 4 "启动 Docker 容器..."
