@@ -60,7 +60,7 @@ services:
 
   free5gc-amf:
     container_name: amf
-    image: free5gc/amf:buildv6
+    image: free5gc/amf:buildv8
     command: ./amf -c ./config/amfcfg.yaml
     ports:
       - "0.0.0.0:38412:38412/sctp"
