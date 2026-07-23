@@ -9,3 +9,8 @@
 .codex/auth.json
 .gemini/google_accounts.json
 .codex/
+
+# Vim swap files
+*.swp
+*.swo
+*.swn
