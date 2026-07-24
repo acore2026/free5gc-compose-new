@@ -38,6 +38,7 @@ configuration:
         mnc: 01
       snssaiList:
         - sst: 1
+        - sst: 1
           sd: 000000
         - sst: 1
           sd: 112233
@@ -112,7 +113,7 @@ configuration:
     maxInstreams: 5
     maxAttempts: 2
     maxInitTimeout: 2
-  defaultUECtxReq: false
+  defaultUECtxReq: true
   nagent:
     enabled: true
     baseUri: http://127.0.0.1:8088

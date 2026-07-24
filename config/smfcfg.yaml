@@ -19,6 +19,31 @@ configuration:
   snssaiInfos:
     - sNssai:
         sst: 1
+      dnnInfos:
+        - dnn: internet
+          dns:
+            ipv4: 8.8.8.8
+            ipv6: 2001:4860:4860::8888
+          pduSessionTypes:
+            - IPv4
+            - IPv6
+            - IPv4v6
+        - dnn: IMS
+          dns:
+            ipv4: 10.100.200.99
+            ipv6: 2001:4860:4860::8888
+          pcscf:
+            ipv4: 10.100.200.99
+            ipv6: 2001:4860:4860::8888
+        - dnn: ims
+          dns:
+            ipv4: 10.100.200.99
+            ipv6: 2001:4860:4860::8888
+          pcscf:
+            ipv4: 10.100.200.99
+            ipv6: 2001:4860:4860::8888
+    - sNssai:
+        sst: 1
         sd: 000000
       dnnInfos:
         - dnn: internet
@@ -86,6 +111,18 @@ configuration:
         nodeID: upf.free5gc.org
         addr: upf.free5gc.org
         sNssaiUpfInfos:
+          - sNssai:
+              sst: 1
+            dnnUpfInfoList:
+              - dnn: internet
+                pools:
+                  - cidr: 10.70.0.0/16
+              - dnn: IMS
+                pools:
+                  - cidr: 10.72.0.0/16
+              - dnn: ims
+                pools:
+                  - cidr: 10.74.0.0/16
           - sNssai:
               sst: 1
               sd: 000000

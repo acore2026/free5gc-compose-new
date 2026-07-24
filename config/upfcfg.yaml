@@ -15,6 +15,13 @@ sbi:
   bindingIPv4: upf.free5gc.org
   port: 8000
 
+snssaiList:
+  - sst: 1
+  - sst: 1
+    sd: 000000
+  - sst: 1
+    sd: 112233
+
 gtpu:
   forwarder: userspace
   ifList:
