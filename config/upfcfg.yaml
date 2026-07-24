@@ -46,6 +46,15 @@ gtpu:
 
 dnnList:
   - dnn: internet
+    cidr: 10.70.0.0/16
+    natifname: eth0
+  - dnn: IMS
+    cidr: 10.72.0.0/16
+    natifname: eth0
+  - dnn: ims
+    cidr: 10.74.0.0/16
+    natifname: eth0
+  - dnn: internet
     cidr: 10.60.0.0/16
     natifname: eth0
   - dnn: internet
