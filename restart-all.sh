@@ -2,13 +2,24 @@
 
 set -e
 
+cd "$(dirname "$0")"
+
+QOS_SCRIPT="/home/core/QoSModule/scripts/start-qos.sh"
+QOS_MODE="${QOS_MODE:-ran-udp}"
+
+MASQUE_DIR="/home/core/masque/proxy"
+MASQUE_LOG="/home/core/masque/proxy.log"
+MASQUE_PID_FILE="/tmp/masque-proxy.pid"
+MASQUE_PROXY_TARGET="${MASQUE_PROXY_TARGET:-https://10.88.120.100:443}"
+MASQUE_GOPROXY="${MASQUE_GOPROXY:-https://goproxy.cn,direct}"
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-TOTAL=7
+TOTAL=9
 
 step() { echo -e "${BLUE}[$1/$TOTAL] $2${NC}"; }
 ok() { echo -e "${GREEN}  ✓ $1${NC}"; }
@@ -18,14 +29,24 @@ echo "=========================================="
 echo "     核心网重启脚本"
 echo "=========================================="
 
-step 1 "停止 IMS 服务..."
+step 1 "停止 IMS / QoS / masque 服务..."
+if [ -f "$MASQUE_PID_FILE" ]; then
+    kill "$(cat "$MASQUE_PID_FILE")" 2>/dev/null || true
+    sleep 1
+    rm -f "$MASQUE_PID_FILE"
+fi
+pkill -f "go run.*cmd/proxy -proxy" 2>/dev/null || true
+pkill -f "proxy -proxy https://10.88.120.100:443" 2>/dev/null || true
 systemctl stop free5gc-ue-routes.service 2>/dev/null || true
 systemctl stop free5gc-disable-offload.service 2>/dev/null || true
 systemctl stop kamailio.service 2>/dev/null || true
-ok "IMS 服务已停止"
+if [ -x "$QOS_SCRIPT" ]; then
+    "$QOS_SCRIPT" stop >/dev/null 2>&1 || true
+fi
+ok "IMS / QoS / masque 服务已停止"
 
 step 2 "停止 Docker 容器..."
-docker-compose down || fail "Docker 容器停止失败"
+docker-compose down || true
 ok "Docker 容器已停止"
 
 step 3 "加载 gtp5g 内核模块..."
@@ -102,6 +123,48 @@ systemctl restart kamailio.service || fail "kamailio 启动失败"
 ok "kamailio"
 systemctl restart free5gc-disable-offload.service || fail "free5gc-disable-offload 启动失败"
 ok "free5gc-disable-offload"
+
+step 8 "启动 QoS 模块 ($QOS_MODE)..."
+if [ ! -x "$QOS_SCRIPT" ]; then
+    fail "未找到 QoS 脚本: $QOS_SCRIPT"
+fi
+"$QOS_SCRIPT" "$QOS_MODE" || fail "QoS 模块启动失败"
+ok "QoS 模块已启动 ($QOS_MODE)"
+
+step 9 "启动 masque proxy..."
+if [ ! -d "$MASQUE_DIR" ]; then
+    fail "未找到 masque 目录: $MASQUE_DIR"
+fi
+if [ -f "$MASQUE_PID_FILE" ] && kill -0 "$(cat "$MASQUE_PID_FILE")" 2>/dev/null; then
+    fail "masque proxy 已在运行 (pid=$(cat "$MASQUE_PID_FILE"))"
+fi
+OLD_PWD="$(pwd)"
+cd "$MASQUE_DIR"
+GOPROXY="$MASQUE_GOPROXY" nohup go run ./cmd/proxy -proxy "$MASQUE_PROXY_TARGET" > "$MASQUE_LOG" 2>&1 &
+MPID=$!
+echo "$MPID" > "$MASQUE_PID_FILE"
+cd "$OLD_PWD"
+READY=0
+for i in $(seq 1 30); do
+    if ! kill -0 "$MPID" 2>/dev/null; then
+        echo -e "${RED}  详细日志:${NC}"
+        tail -10 "$MASQUE_LOG" 2>/dev/null
+        fail "masque proxy 启动失败,查看日志: $MASQUE_LOG"
+    fi
+    if grep -q "MASQUE Proxy ready" "$MASQUE_LOG" 2>/dev/null; then
+        READY=1
+        break
+    fi
+    sleep 1
+done
+if [ "$READY" = "1" ]; then
+    ok "masque proxy 已启动 (pid=$MPID, target=$MASQUE_PROXY_TARGET)"
+    echo -e "${BLUE}  ℹ 日志: tail -f $MASQUE_LOG${NC}"
+else
+    echo -e "${YELLOW}  超时未确认就绪,当前日志:${NC}"
+    tail -10 "$MASQUE_LOG" 2>/dev/null
+    fail "masque proxy 未就绪,查看日志: $MASQUE_LOG"
+fi
 
 echo ""
 echo "=========================================="
