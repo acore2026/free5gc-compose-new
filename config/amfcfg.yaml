@@ -116,20 +116,24 @@ configuration:
   defaultUECtxReq: true
   nagent:
     enabled: true
-    baseUri: http://127.0.0.1:8088
+    baseUri: http://192.168.1.10:9100
+    transportPassthrough:
+      enabled: true
+      payloadContainerType: 4
+      maxPayloadBytes: 1400
     connectTimeoutMs: 1000
-    attemptTimeoutMs: 10000
-    totalTimeoutMs: 12000
-    maxAttempts: 1
+    attemptTimeoutMs: 2000
+    totalTimeoutMs: 3000
+    maxAttempts: 3
     maxPayloadBytes: 65535
     maxInFlight: 64
-    maxInFlightPerUE: 8
+    maxInFlightPerUe: 8
     queueSize: 256
     pendingDlTtlSeconds: 60
     mock:
       enabled: true
       listenAddress: 127.0.0.1:8088
-      delayMs: 8000
+      delayMs: 0
       status: 200
   metrics:
     enable: false
