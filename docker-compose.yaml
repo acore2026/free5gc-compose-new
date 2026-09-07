@@ -134,7 +134,7 @@ services:
 
   free5gc-smf:
     container_name: smf
-    image: free5gc/smf:v4.2.1
+    image: free5gc/smf:fix-setup-9a4d8ba
     command: ./smf -c ./config/smfcfg.yaml -u ./config/uerouting.yaml
     expose:
       - "8000"
