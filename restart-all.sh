@@ -90,7 +90,7 @@ ok "UE 上下文已清理"
 
 step 6 "配置网络环境..."
 ip addr add 10.88.120.100/24 dev eth1 2>/dev/null || true
-ip addr add 10.88.120.99/24 dev eth1 2>/dev/null || true
+# [10.88.120.99 removed — caused SCTP multi-homing ABORT loop on NGAP] ip addr add 10.88.120.99/24 dev eth1 2>/dev/null || true
 ip link set eth1 up
 ip addr add 10.100.200.99/24 dev br-free5gc 2>/dev/null || true
 ok "网络配置完成"

@@ -10,7 +10,7 @@ imei: "356938035643804"
 imeiSv: "4370816125816152"
 
 gnbSearchList:
-  - 10.88.120.99
+  # [deprecated UERANSIM sim-gNB; 10.88.120.99 removed] - 10.88.120.99
 
 uacAic:
   mps: false
