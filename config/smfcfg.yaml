@@ -130,12 +130,23 @@ configuration:
               - dnn: internet
                 pools:
                   - cidr: 10.60.0.0/16
+                staticPools:
+                  - cidr: 10.60.0.1/32
+                  - cidr: 10.60.0.3/32
+                  - cidr: 10.60.0.4/32
+                  - cidr: 10.60.0.200/32
+                  - cidr: 10.60.0.201/32
               - dnn: IMS
                 pools:
                   - cidr: 10.62.0.0/16
               - dnn: ims
                 pools:
                   - cidr: 10.64.0.0/16
+                staticPools:
+                  - cidr: 10.64.0.1/32
+                  - cidr: 10.64.0.3/32
+                  - cidr: 10.64.0.200/32
+                  - cidr: 10.64.0.201/32
           - sNssai:
               sst: 1
               sd: 112233

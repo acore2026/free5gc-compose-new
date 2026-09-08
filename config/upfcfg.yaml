@@ -28,7 +28,7 @@ gtpu:
     - addr: 0.0.0.0
       type: N3
   userspace:
-    workers: 4
+    workers: 1
     queueSize: 1024
     tunName: upfusr0
     tunMtu: 1400

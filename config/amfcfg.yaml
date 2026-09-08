@@ -122,18 +122,33 @@ configuration:
       payloadContainerType: 4
       maxPayloadBytes: 1400
     connectTimeoutMs: 1000
-    attemptTimeoutMs: 2000
-    totalTimeoutMs: 3000
-    maxAttempts: 3
+    attemptTimeoutMs: 10000
+    totalTimeoutMs: 12000
+    maxAttempts: 1
     maxPayloadBytes: 65535
     maxInFlight: 64
-    maxInFlightPerUe: 8
+    maxInFlightPerUE: 8
     queueSize: 256
     pendingDlTtlSeconds: 60
+    routes:
+      - name: intent
+        baseUri: http://192.168.1.10:9100
+        path: /nagent-intent/v1/intent/{supi}
+        schema: intent
+        intentTypes:
+          - ACN_NETWORKING
+          - COMPUTING
+          - "*"
+      - name: voice
+        baseUri: http://192.168.1.10:8787
+        path: /api/v1/voice
+        schema: voice
+        intentTypes:
+          - VOICE_COMMAND
     mock:
-      enabled: true
+      enabled: false
       listenAddress: 127.0.0.1:8088
-      delayMs: 0
+      delayMs: 100
       status: 200
   metrics:
     enable: false

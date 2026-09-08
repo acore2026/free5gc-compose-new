@@ -38,6 +38,7 @@ services:
       privnet:
         aliases:
           - db
+        ipv4_address: 10.100.200.2
 
   free5gc-nrf:
     container_name: nrf
@@ -55,12 +56,13 @@ services:
       privnet:
         aliases:
           - nrf.free5gc.org
+        ipv4_address: 10.100.200.4
     depends_on:
       - db
 
   free5gc-amf:
     container_name: amf
-    image: free5gc/amf:buildv15
+    image: free5gc/amf:buildv18
     command: ./amf -c ./config/amfcfg.yaml
     ports:
       - "0.0.0.0:38412:38412/sctp"
@@ -75,6 +77,7 @@ services:
       privnet:
         aliases:
           - amf.free5gc.org
+        ipv4_address: 10.100.200.12
     depends_on:
       - free5gc-nrf
 
@@ -93,6 +96,7 @@ services:
       privnet:
         aliases:
           - ausf.free5gc.org
+        ipv4_address: 10.100.200.13
     depends_on:
       - free5gc-nrf
 
@@ -111,6 +115,7 @@ services:
       privnet:
         aliases:
           - nssf.free5gc.org
+        ipv4_address: 10.100.200.10
     depends_on:
       - free5gc-nrf
 
@@ -129,12 +134,13 @@ services:
       privnet:
         aliases:
           - pcf.free5gc.org
+        ipv4_address: 10.100.200.9
     depends_on:
       - free5gc-nrf
 
   free5gc-smf:
     container_name: smf
-    image: free5gc/smf:v4.2.1
+    image: free5gc/smf:fix-setup-9a4d8ba
     command: ./smf -c ./config/smfcfg.yaml -u ./config/uerouting.yaml
     expose:
       - "8000"
@@ -148,6 +154,7 @@ services:
       privnet:
         aliases:
           - smf.free5gc.org
+        ipv4_address: 10.100.200.8
     depends_on:
       - free5gc-nrf
       - free5gc-upf
@@ -167,6 +174,7 @@ services:
       privnet:
         aliases:
           - udm.free5gc.org
+        ipv4_address: 10.100.200.7
     depends_on:
       - db
       - free5gc-nrf
@@ -187,6 +195,7 @@ services:
       privnet:
         aliases:
           - udr.free5gc.org
+        ipv4_address: 10.100.200.5
     depends_on:
       - db
       - free5gc-nrf
@@ -207,6 +216,7 @@ services:
       privnet:
         aliases:
           - chf.free5gc.org
+        ipv4_address: 10.100.200.14
     depends_on:
       - db
       - free5gc-nrf
@@ -227,6 +237,7 @@ services:
       privnet:
         aliases:
           - nef.free5gc.org
+        ipv4_address: 10.100.200.11
     depends_on:
       - db
       - free5gc-nrf
@@ -245,6 +256,7 @@ services:
       privnet:
         aliases:
           - webui
+        ipv4_address: 10.100.200.6
     ports:
       - "5000:5000"
       - "2122:2122"

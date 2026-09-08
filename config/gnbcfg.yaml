@@ -5,9 +5,9 @@ nci: "0x000000010"
 idLength: 32
 tac: 000001
 
-linkIp: 10.88.120.99
-ngapIp: 10.88.120.99
-gtpIp: 10.88.120.99
+# [deprecated UERANSIM sim-gNB; 10.88.120.99 removed] linkIp: 10.88.120.99
+# [deprecated] ngapIp: 10.88.120.99
+# [deprecated] gtpIp: 10.88.120.99
 
 amfConfigs:
   - address: 10.88.120.100
