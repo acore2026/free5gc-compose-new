@@ -116,7 +116,11 @@ configuration:
   defaultUECtxReq: true
   nagent:
     enabled: true
-    baseUri: http://127.0.0.1:8088
+    baseUri: http://192.168.1.10:9100
+    transportPassthrough:
+      enabled: true
+      payloadContainerType: 4
+      maxPayloadBytes: 1400
     connectTimeoutMs: 1000
     attemptTimeoutMs: 10000
     totalTimeoutMs: 12000
@@ -126,10 +130,25 @@ configuration:
     maxInFlightPerUE: 8
     queueSize: 256
     pendingDlTtlSeconds: 60
+    routes:
+      - name: intent
+        baseUri: http://192.168.1.10:9100
+        path: /nagent-intent/v1/intent/{supi}
+        schema: intent
+        intentTypes:
+          - ACN_NETWORKING
+          - COMPUTING
+          - "*"
+      - name: voice
+        baseUri: http://192.168.1.10:8787
+        path: /api/v1/voice
+        schema: voice
+        intentTypes:
+          - VOICE_COMMAND
     mock:
-      enabled: true
+      enabled: false
       listenAddress: 127.0.0.1:8088
-      delayMs: 8000
+      delayMs: 100
       status: 200
   metrics:
     enable: false
