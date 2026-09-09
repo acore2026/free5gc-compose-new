@@ -14,3 +14,5 @@
 *.swp
 *.swo
 *.swn
+
+docker-compose.built.yaml

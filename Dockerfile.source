@@ -1,0 +1,22 @@
+ARG GO_IMAGE=golang:1.25.5-trixie
+ARG BASE_IMAGE
+FROM ${GO_IMAGE} AS builder
+ARG NF
+ARG GOPROXY=https://proxy.golang.org,direct
+WORKDIR /src
+COPY ${NF}/ ./
+RUN case "$NF" in \
+      amf|smf) main=./cmd/; export CGO_ENABLED=0; flags='-s -w' ;; \
+      upf) main=./cmd/main.go; export CGO_ENABLED=1; flags='' ;; \
+      *) echo "Unsupported NF: $NF" >&2; exit 1 ;; \
+    esac && \
+    GOOS=linux GOARCH=amd64 GOAMD64=v1 go build \
+      -ldflags="$flags" -o "/out/$NF" "$main"
+
+FROM ${BASE_IMAGE}
+ARG NF
+ARG SOURCE_REVISION
+ARG BASE_REVISION
+LABEL org.opencontainers.image.revision=${SOURCE_REVISION} \
+      org.free5gc.build.base=${BASE_REVISION}
+COPY --from=builder /out/ /free5gc/
