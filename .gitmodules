@@ -1,3 +1,10 @@
 [submodule "nf_amf/amf"]
 	path = nf_amf/amf
 	url = git@github.com:acore2026/amf.git
+[submodule "nf_smf/smf"]
+	path = nf_smf/smf
+	url = git@github.com:acore2026/smf.git
+[submodule "nf_upf/upf"]
+	path = nf_upf/upf
+	url = git@github.com:acore2026/go-upf.git
+	branch = fix/pfcp-remote-session-nil-guard
